@@ -6,6 +6,7 @@ import categoryRouter from "./routes/categoryRoutes";
 import bossRouter from "./routes/bossesRoutes";
 import questRouter from "./routes/questsRoutes";
 import HttpError from "./models/httpError";
+import objectsRouter from "./routes/objectsRoutes";
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/bosses", bossRouter);
 
 app.use("/api/quests", questRouter);
+
+app.use("/api/objects", objectsRouter);
 
 app.use(
   (
