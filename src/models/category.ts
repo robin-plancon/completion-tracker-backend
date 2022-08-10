@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 interface Icategory {
   name: string;
   link?: string;
-  parent?: Icategory;
+  parent?: mongoose.Types.ObjectId;
 }
 
 const categorySchema = new Schema({
@@ -17,7 +17,7 @@ const categorySchema = new Schema({
     require: false,
     ref: "Category",
     default: undefined,
-  },
+  }
 });
 
 categorySchema.plugin(uniqueValidator);

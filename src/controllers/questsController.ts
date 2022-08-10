@@ -113,10 +113,27 @@ const updateQuest = async (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({ quest: result.toObject({ getters: true }) });
 };
 
-// implementation des step avant
-// const deleteQuest = async (req: Request, res: Response, next: NextFunction) => {
+const deleteQuest = async (req: Request, res: Response, next: NextFunction) => {
+  const questId = req.params.questId;
 
-// }
+  let result;
+  try {
+    result = await Quest.findByIdAndRemove(questId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete quest.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!result) {
+    const error = new HttpError("Could not find quest for this id.", 404);
+    return next(error);
+  }
+
+  res.status(200).json({ message: "Quest deleted." });
+};
 
 const getSteps = async (req: Request, res: Response, next: NextFunction) => {
   const questId = req.params.questId;
@@ -182,8 +199,14 @@ const updateStep = async (req: Request, res: Response, next: NextFunction) => {
   let result;
   try {
     result = await Quest.findOneAndUpdate(
-      {"steps._id": stepId},
-      { $set: { "steps.$.text": text, "steps.$.link": link, "steps.$.status": status } },
+      { "steps._id": stepId },
+      {
+        $set: {
+          "steps.$.text": text,
+          "steps.$.link": link,
+          "steps.$.status": status,
+        },
+      },
       { new: true }
     );
   } catch (err) {
@@ -214,8 +237,8 @@ const deleteStep = async (req: Request, res: Response, next: NextFunction) => {
   let result;
   try {
     result = await Quest.findOneAndUpdate(
-      {"steps._id": stepId},
-      { $pull: { steps: {_id: stepId}} },
+      { "steps._id": stepId },
+      { $pull: { steps: { _id: stepId } } },
       { new: true }
     );
   } catch (err) {
@@ -235,12 +258,10 @@ const deleteStep = async (req: Request, res: Response, next: NextFunction) => {
     return next(error);
   }
 
-  res
-    .status(200)
-    .json({
-      message: "Step deleted",
-      quest: result.toObject({ getters: true }),
-    });
+  res.status(200).json({
+    message: "Step deleted",
+    quest: result.toObject({ getters: true }),
+  });
 };
 
 export {
@@ -248,6 +269,7 @@ export {
   getQuest,
   createQuest,
   updateQuest,
+  deleteQuest,
   getSteps,
   createStep,
   updateStep,

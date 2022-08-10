@@ -2,6 +2,7 @@ import express from "express";
 import { check, oneOf } from "express-validator";
 import {
   createObject,
+  deleteObject,
   getAllObjects,
   getObjectsFromCategory,
   updateObject,
@@ -42,5 +43,7 @@ const updateObjectValidation = [
 ];
 
 objectsRouter.patch("/:objectId", updateObjectValidation, updateObject);
+
+objectsRouter.delete("/:objectId", deleteObject);
 
 export default objectsRouter;

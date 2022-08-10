@@ -60,7 +60,6 @@ const createObject = async (
   next: NextFunction
 ) => {
   const errors = validationResult(req);
-  console.log(errors);
   if (!errors.isEmpty()) {
     let errMsg = "";
     errors.array().forEach((err) => (errMsg += err.msg + " "));
@@ -114,6 +113,7 @@ const createObject = async (
     await createdObject.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Creating object failed, please try again.",
       500
@@ -201,4 +201,30 @@ const updateObject = async (
   res.status(200).json({ object: result.toObject({ getters: true }) });
 };
 
-export { getAllObjects, getObjectsFromCategory, createObject, updateObject };
+const deleteObject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const objectId = req.params.objectId;
+
+  let result;
+  try {
+    result = await Object.findByIdAndRemove(objectId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete object.",
+      500
+    );
+    return next(error);
+  }
+
+  if(!result) {
+    const error = new HttpError("Could not find object for this id.", 404);
+    return next(error);
+  }
+
+  res.status(200).json({message: "Object deleted."});
+};
+
+export { getAllObjects, getObjectsFromCategory, createObject, updateObject, deleteObject };

@@ -7,11 +7,17 @@ import {
   getChildsCategories,
   updateCategory,
   deleteCategory,
+  getRootCategories,
+  getCategoriesTree,
 } from "../controllers/categoriesController";
 
 const categoryRouter = express.Router();
 
 categoryRouter.get("/", getCategories);
+
+categoryRouter.get("/tree", getCategoriesTree);
+
+categoryRouter.get("/root", getRootCategories);
 
 categoryRouter.get("/:categoryId", getCategory);
 
@@ -31,6 +37,7 @@ const updateCategoryValidation = [
       check("name").exists(),
       check("link").exists(),
       check("status").exists(),
+      check("parent").exists()
     ],
     "No inputs passed, please check your data."
   ),

@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import mongoose from "mongoose";
 import Category from "../models/category";
 import HttpError from "../models/httpError";
+import Object from "../models/object";
 
 const getCategories = async (
   req: Request,
@@ -49,6 +50,57 @@ const getCategory = async (req: Request, res: Response, next: NextFunction) => {
   res.json({ category: categorySearched.toObject({ getters: true }) });
 };
 
+const getCategoriesTree = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  let tree;
+
+  try {
+    tree = await Category.aggregate().graphLookup({from: "categories", startWith: "$parent", connectFromField: "parent", connectToField: "_id", as: "parents"});
+  } catch (err) {
+    const error = new HttpError("Fetching categories tree failed, please try again later.", 500);
+    return next(error);
+  }
+  res.status(200).json({
+    tree: tree
+  });
+};
+
+const getRootCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  let categories;
+
+  try {
+    categories = await Category.find({ parent: undefined || null });
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Fetching categories failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  if(!categories) {
+    const error = new HttpError(
+      "Could not find categories.",
+      401
+    );
+    return next(error);
+  }
+
+  res.status(200).json({
+    categories: categories.map((category) =>
+      category.toObject({ getters: true })
+    ),
+  });
+};
+
 const getChildsCategories = async (
   req: Request,
   res: Response,
@@ -83,9 +135,7 @@ const createCategory = async (
   if (!errors.isEmpty()) {
     let errMsg = "";
     errors.array().forEach((err) => (errMsg += err.msg + " "));
-    return next(
-      new HttpError(errMsg, 422)
-    );
+    return next(new HttpError(errMsg, 422));
   }
 
   const { name, link, parent } = req.body;
@@ -93,7 +143,7 @@ const createCategory = async (
   const createdCategory = new Category({
     name,
     link,
-    parent,
+    parent
   });
 
   try {
@@ -128,7 +178,7 @@ const updateCategory = async (
   const { name, link, parent } = req.body;
   const categoryId = req.params.categoryId;
 
-  const updateQuery: { name?: string; link?: string; parent?: number } = {};
+  const updateQuery: { name?: string; link?: string; parent?: mongoose.Types.ObjectId } = {};
 
   if (name) {
     updateQuery.name = name;
@@ -170,9 +220,10 @@ const deleteCategory = async (
 ) => {
   const categoryId = req.params.categoryId;
 
-  let result;
+  let resultCategory;
   try {
-    result = Category.findByIdAndRemove(categoryId);
+    resultCategory = await Category.findByIdAndRemove(categoryId);
+    await Object.deleteMany({categoryId: categoryId});
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete category.",
@@ -181,8 +232,8 @@ const deleteCategory = async (
     return next(error);
   }
 
-  if (!result) {
-    const error = new HttpError("Could not find category for this id.", 401);
+  if (!resultCategory) {
+    const error = new HttpError("Could not find category for this id.", 404);
     return next(error);
   }
 
@@ -192,6 +243,8 @@ const deleteCategory = async (
 export {
   getCategories,
   getCategory,
+  getCategoriesTree,
+  getRootCategories,
   getChildsCategories,
   createCategory,
   updateCategory,

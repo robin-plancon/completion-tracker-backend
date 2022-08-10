@@ -3,6 +3,7 @@ import { check, oneOf } from "express-validator";
 import {
   createQuest,
   createStep,
+  deleteQuest,
   deleteStep,
   getQuest,
   getQuests,
@@ -41,6 +42,8 @@ const updateQuestValidation = [
 ];
 
 questRouter.patch("/:questId", updateQuestValidation, updateQuest);
+
+questRouter.delete("/:questId", deleteQuest);
 
 questRouter.get("/steps/:questId", getSteps);
 
