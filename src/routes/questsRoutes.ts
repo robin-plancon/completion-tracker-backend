@@ -21,7 +21,7 @@ questRouter.get("/:questId", getQuest);
 const postQuestValidation = [
   check("name", "Name must not be empty.").not().isEmpty(),
   check("name", "Name must be a string.").isString(),
-  check("link", "Link must be a string.").optional().isString(),
+  check("link", "Link must be an URL.").optional().isURL(),
   check("status", "Status must be a boolean.").optional().isBoolean(),
 ];
 
@@ -37,7 +37,7 @@ const updateQuestValidation = [
     .not()
     .isEmpty()
     .isString(),
-  check("link", "Link must be a string.").optional().isString(),
+  check("link", "Link must be an URL.").optional().isURL(),
   check("status", "Status must be a boolean.").optional().isBoolean(),
 ];
 
@@ -50,7 +50,7 @@ questRouter.get("/steps/:questId", getSteps);
 const postStepValidation = [
   check("text", "text must not be empty.").not().isEmpty(),
   check("text", "text must be a string.").isString(),
-  check("link", "Link must be a string.").optional().isString(),
+  check("link", "Link must be an URL.").optional().isURL(),
   check("status", "Status must be a boolean.").optional().isBoolean(),
 ];
 

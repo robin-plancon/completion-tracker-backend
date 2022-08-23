@@ -19,7 +19,7 @@ const postBossValidation = [
     .not()
     .isEmpty()
     .isString(),
-  check("link", "Link must be a string.").optional().isString(),
+  check("link", "Link must be an URL.").optional().isURL(),
   check("status", "Status must be a boolean.").optional().isBoolean(),
   check("location", "Location must be a string and not empty.")
     .not()
@@ -44,7 +44,7 @@ const updateBossValidation = [
     .not()
     .isEmpty()
     .isString(),
-  check("link", "Link must be a string.").optional().isString(),
+  check("link", "Link must be an URL.").optional().isURL(),
   check("status", "Status must be a boolean.").optional().isBoolean(),
   check("location", "Location must be a string and not empty.")
     .optional()

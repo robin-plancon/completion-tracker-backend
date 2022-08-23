@@ -18,7 +18,7 @@ const postObjectValidation = [
   check("categoryId", "category must not be empty.").not().isEmpty(),
   check("name", "name must not be empty.").not().isEmpty(),
   check("name", "name must be a string.").isString(),
-  check("link", "link must be a string.").optional().isString(),
+  check("link", "link must be an URL.").optional().isURL(),
   check("status", "status must be a boolean.").optional().isBoolean(),
   check("location", "location must be a string.").optional().isString(),
   check("details", "details must be a string.").optional().isString(),
@@ -35,7 +35,7 @@ const updateObjectValidation = [
     check("details").exists(),
   ]),
   check("name", "name must be a string and not empty.").optional().not().isEmpty().isString(),
-  check("link", "link must be a string.").optional().isString(),
+  check("link", "link must be an URL.").optional().isURL(),
   check("status", "status must be a boolean.").optional().isBoolean(),
   check("location", "location must be a string.").optional().isString(),
   check("details").optional().isString()
