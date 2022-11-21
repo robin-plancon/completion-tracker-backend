@@ -124,7 +124,7 @@ const deleteBoss = async (req: Request, res: Response, next: NextFunction) => {
 
   let result;
   try {
-    result = Boss.findByIdAndRemove(bossId);
+    result = await Boss.findByIdAndRemove(bossId);
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete Boss.",
